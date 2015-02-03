@@ -1,7 +1,7 @@
 // interrupt pins for known boards
 
 // Teensy and maybe others automatically define this info
-#if !defined(CORE_INT0_PIN)
+#if !defined(CORE_INT0_PIN) && !defined(CORE_INT1_PIN) && !defined(CORE_INT2_PIN)&& !defined(CORE_INT3_PIN)
 
 // Arduino Mega
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
