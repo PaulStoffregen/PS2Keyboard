@@ -202,6 +202,11 @@ class PS2Keyboard {
     static bool available();
     
     /**
+     * Sets available() to false without a call to read()
+     */
+    static void flush();
+    
+    /**
      * Returns the char last read from the keyboard.
      * If there is no char available, -1 is returned.
      */
