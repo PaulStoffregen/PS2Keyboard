@@ -188,19 +188,24 @@ class PS2Keyboard {
   	 * method before using any other method of this class.
   	 */
     PS2Keyboard();
-    
+
     /**
      * Starts the keyboard "service" by registering the external interrupt.
      * setting the pin modes correctly and driving those needed to high.
      * The propably best place to call this method is in the setup routine.
      */
     static void begin(uint8_t dataPin, uint8_t irq_pin, const PS2Keymap_t &map = PS2Keymap_US);
-    
+
     /**
      * Returns true if there is a char to be read, false if not.
      */
     static bool available();
-    
+
+    /**
+     * Retutns ps2 scan code.
+     */
+    static uint8_t readScanCode(void);
+
     /**
      * Returns the char last read from the keyboard.
      * If there is no char available, -1 is returned.
