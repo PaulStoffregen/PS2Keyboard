@@ -353,6 +353,11 @@ bool PS2Keyboard::available() {
 	return false;
 }
 
+void PS2Keyboard::clear() {
+	CharBuffer = 0;
+	UTF8next = 0;
+}
+
 uint8_t PS2Keyboard::readScanCode(void)
 {
 	return get_scan_code();

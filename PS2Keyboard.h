@@ -201,6 +201,10 @@ class PS2Keyboard {
      */
     static bool available();
 
+    /* Discards any received data, sets available() to false without a call to read()
+    */
+    static void clear();
+
     /**
      * Retutns ps2 scan code.
      */
