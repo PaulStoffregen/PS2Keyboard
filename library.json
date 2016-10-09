@@ -2,15 +2,41 @@
   "name": "PS2Keyboard",
   "keywords": "keyboard, emulation",
   "description": "PS2Keyboard (PS/2) allows you to use a keyboard for user input",
+  "authors":
+  [
+    {
+      "name": "Paul Stoffregen",
+      "email": "paul@pjrc.com",
+      "url": "http://www.pjrc.com",
+      "maintainer": true
+    },
+    {
+      "name": "Christian Weichel",
+      "email": "info@32leaves.net"
+    },
+    {
+      "name": "L. Abraham Smith",
+      "email": "n3bah@microcompdesign.com"
+    },
+    {
+      "name": "Cuningan",
+      "email": "cuninganreset@gmail.com"
+    },
+  ],
   "repository":
   {
     "type": "git",
     "url": "https://github.com/PaulStoffregen/PS2Keyboard.git"
   },
+  "version": "2.4",
+  "homepage": "http://www.pjrc.com/teensy/td_libs_PS2Keyboard.html",
   "frameworks": "arduino",
   "platforms":
   [
     "atmelavr",
     "teensy"
+  ],
+  "examples": [
+    "examples/*/*.pde"
   ]
 }
