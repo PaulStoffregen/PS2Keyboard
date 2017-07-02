@@ -55,6 +55,10 @@
 #elif defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
   #define CORE_INT0_PIN  2
 
+//ESP8266 - NodeMCU 0.9 (ESP-12 Module) / NodeMCU 1.0 (ESP-12E Module)
+#elif defined(ARDUINO_ESP8266_NODEMCU)
+  #define CORE_INT_EVERY_PIN
+  
 // Arduino Uno, Duemilanove, LilyPad, Mini, Fio, etc...
 #else
   #define CORE_INT0_PIN  2
