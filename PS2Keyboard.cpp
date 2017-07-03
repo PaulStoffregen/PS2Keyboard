@@ -149,7 +149,7 @@ const PROGMEM PS2Keymap_t PS2Keymap_US = {
 	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
 	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
 	0, 0, 0, PS2_F7 },
-	{0}
+	0
 };
 
 
@@ -190,7 +190,7 @@ const PROGMEM PS2Keymap_t PS2Keymap_German = {
 	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
 	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
 	0, 0, 0, PS2_F7 },
-	{1},
+	1,
   // with altgr
 	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
 	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0, 0,
@@ -249,7 +249,7 @@ const PROGMEM PS2Keymap_t PS2Keymap_French = {
 	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
 	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
 	0, 0, 0, PS2_F7 },
-	{1},
+	1,
   // with altgr
 	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
 	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0, 0,
@@ -307,7 +307,7 @@ const PROGMEM PS2Keymap_t PS2Keymap_Spanish = {
 		 '0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
 		 PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
 		 0, 0, 0, PS2_F7 },
-         {1},
+         1,
 		// with altgr
 		{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
 		 0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '\\', 0,
