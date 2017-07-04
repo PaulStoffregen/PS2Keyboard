@@ -168,7 +168,14 @@
 typedef struct {
 	uint8_t noshift[PS2_KEYMAP_SIZE];
 	uint8_t shift[PS2_KEYMAP_SIZE];
-	uint8_t uses_altgr;
+	unsigned int uses_altgr;
+    /*
+     * "uint8_t uses_altgr;" makes the ESP8266 - NodeMCU modules crash.
+     * So, I replaced it with an int and... It works!
+     * I think it's because of the 32-bit architecture of the ESP8266
+     * and the use of the flash memory to store the keymaps.
+     * Maybe I'm wrong, it remains a hypothesis.
+     */
 	uint8_t altgr[PS2_KEYMAP_SIZE];
 } PS2Keymap_t;
 
