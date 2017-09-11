@@ -58,7 +58,11 @@
 //ESP8266 - NodeMCU 0.9 (ESP-12 Module) / NodeMCU 1.0 (ESP-12E Module)
 #elif defined(ARDUINO_ESP8266_NODEMCU)
   #define CORE_INT_EVERY_PIN
-  
+
+//ESP32 support
+#elif defined(ESP32)
+  #define CORE_INT_EVERY_PIN
+
 // Arduino Uno, Duemilanove, LilyPad, Mini, Fio, etc...
 #else
   #define CORE_INT0_PIN  2
