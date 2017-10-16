@@ -8,7 +8,7 @@
      Arduino Uno:  2, 3
      Arduino Due:  All pins, except 13 (LED)
      Arduino Mega: 2, 3, 18, 19, 20, 21
-     Teensy 2.0:   All pins, except 13 (LED)
+     Teensy 3.0:   All pins, except 13 (LED)
      Teensy 2.0:   5, 6, 7, 8
      Teensy 1.0:   0, 1, 2, 3, 4, 6, 7, 16
      Teensy++ 2.0: 0, 1, 2, 3, 18, 19, 36, 37
