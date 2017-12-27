@@ -19,6 +19,7 @@ void setup() {
   //keyboard.begin(DataPin, IRQpin, PS2Keymap_US);
   keyboard.begin(DataPin, IRQpin, PS2Keymap_German);
   //keyboard.begin(DataPin, IRQpin, PS2Keymap_French);
+  //keyboard.begin(DataPin, IRQpin, PS2Keymap_Italian);
   Serial.begin(9600);
   Serial.println("International Keyboard Test:");
 }
