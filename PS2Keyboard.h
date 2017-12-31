@@ -5,7 +5,8 @@
 
   ** Mostly rewritten Paul Stoffregen <paul@pjrc.com>, June 2010
   ** Modified for use with Arduino 13 by L. Abraham Smith, <n3bah@microcompdesign.com> * 
-  ** Modified for easy interrup pin assignement on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified for easy interrupt pin assignment on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified to provide command send facility. Belliveau <flbgaming@gmail.com> using code by Peter Hanlon <pphanlon@bigpond.net.au> June 2016
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -201,7 +202,7 @@ class PS2Keyboard {
     /**
      * Starts the keyboard "service" by registering the external interrupt.
      * setting the pin modes correctly and driving those needed to high.
-     * The propably best place to call this method is in the setup routine.
+     * The probable best place to call this method is in the setup routine.
      */
     static void begin(uint8_t dataPin, uint8_t irq_pin, const PS2Keymap_t &map = PS2Keymap_US);
 
@@ -210,21 +211,51 @@ class PS2Keyboard {
      */
     static bool available();
 
-    /* Discards any received data, sets available() to false without a call to read()
-    */
+    /**
+     * Discards any received data, sets available() to false without a call to read()
+     */
     static void clear();
 
     /**
-     * Retutns ps2 scan code.
+     * Returns the next ps2 scan code that was received; removing it from
+     * the buffer.
+     *
+     * Calling this method removes the scan code from the buffer such that
+     * it is not available to be translated by the read() or readUincode()
+     * methods.
+     *
+     * @return The next scan code received. Zero when no scan code is
+     *      available.
      */
     static uint8_t readScanCode(void);
 
     /**
-     * Returns the char last read from the keyboard.
-     * If there is no char available, -1 is returned.
+     * Gets the next char read from the keyboard.
+     *
+     * @return The next char read from the keyboard or
+     *      -1 if there is no char available.
      */
     static int read();
     static int readUnicode();
+
+    /**
+     * Sends a byte to the keyboard.
+     *
+     * @param byteCmd Byte value for command to send.
+     *
+     * @return State of DataPin during clock cycle following command
+     *      completion.
+     */
+    static int send(uint8_t byteCmd);
+
+    struct KeyboardState
+    {
+        uint8_t receiving;
+        uint8_t sending;
+        uint8_t outgoing;
+    };
+
+    static KeyboardState getState();
 };
 
 #endif
