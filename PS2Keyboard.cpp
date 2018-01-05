@@ -70,6 +70,29 @@ static uint8_t CharBuffer=0;
 static uint8_t UTF8next=0;
 static const PS2Keymap_t *keymap=NULL;
 
+static inline bool is_scan_code_avail(void)
+{
+    return (tail != head);
+}
+
+static inline uint8_t get_scan_code(void)
+{
+	uint8_t c, i;
+
+	i = tail;
+	if (i == head) return 0;
+	i++;
+	if (i >= BUFFER_SIZE) i = 0;
+	c = buffer[i];
+
+    tail = i;
+    /* Add leading slash for debug output
+    Serial.print(c, HEX);
+    Serial.print(" ");
+    //*/
+	return c;
+}
+
 /* Numbered steps are from http://www.computer-engineering.org/ps2protocol
  * Author: Adam Chapweske
  * Last Updated: 05/09/03
@@ -93,40 +116,59 @@ static const PS2Keymap_t *keymap=NULL;
  * 11) Wait for the device to bring Clock low. 
  * 12) Wait for the device to release Data and Clock
  *
- * @todo Following that one should get the returned status code byte.
+ * After that the keyboard responds with either FA for "okay",
+ * or FE for "try again".
  */
-int PS2Keyboard::send(uint8_t byteCmd)
+uint8_t PS2Keyboard::send(uint8_t byteCmd)
 {
-    /*
-    Serial.print("Send 0x");
-    Serial.println(byteCmd, HEX);
-    //*/
     while (Receiving > 0)      // wait until idle
     {
         // 1100 uSec Max byte Rx time
-        delayMicroseconds(500);
+        delayMicroseconds(100);
     }
-    //Serial.println("...Starting send.");
-
     pinMode(IrqPin,OUTPUT);
     digitalWrite(IrqPin,LOW);
     Sending = 1;
     Outgoing = byteCmd;
     Ack = 1;          // should drop to 0
+    delayMicroseconds(150); // 100 minimum required
     pinMode(DataPin,OUTPUT);
-    delay(1);
     digitalWrite(DataPin,LOW);
+
+    // now that send has control, clear the buffer so response is available
+    clear();
+
 #ifdef INPUT_PULLUP
     pinMode(IrqPin, INPUT_PULLUP);
 #else
     pinMode(IrqPin,INPUT);
     digitalWrite(IrqPin,HIGH);
 #endif
-    while (Sending > 0)
+    unsigned long startTime = micros();
+    
+    while ((Sending > 0) && (2000 > (micros() - startTime)))
     {
         delayMicroseconds(50);
     }
-    return(Ack);
+    uint8_t result = (Sending > 0) ? SEND_TIMED_OUT : SEND_NOT_ACKED;
+
+    if (!Ack) // Send was Ack'ed
+    {
+        startTime = micros();
+        while ((2000 > (micros() - startTime)) && !is_scan_code_avail())
+        {
+            delayMicroseconds(50);
+        }
+        if (is_scan_code_avail())
+        {
+            result = get_scan_code(); // expect Resend or Okay
+        }
+        else
+        {
+            result = SEND_REPLY_TIMEOUT;
+        }
+    }
+    return(result);
 }
 
 // The ISR for the external interrupt
@@ -203,24 +245,6 @@ void ps2interrupt(void)
             //pinMode(DataPin,INPUT);
         }
     }
-}
-
-static inline uint8_t get_scan_code(void)
-{
-	uint8_t c, i;
-
-	i = tail;
-	if (i == head) return 0;
-	i++;
-	if (i >= BUFFER_SIZE) i = 0;
-	c = buffer[i];
-
-    tail = i;
-    /* Add leading slash for debug output
-    Serial.print(c, HEX);
-    Serial.print(" ");
-    //*/
-	return c;
 }
 
 // http://www.quadibloc.com/comp/scan.htm
