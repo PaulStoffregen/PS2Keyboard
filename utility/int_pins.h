@@ -66,6 +66,10 @@
 #elif defined(ESP32)
   #define CORE_INT_EVERY_PIN
 
+//STM32F1 support
+#elif defined(__STM32F1__)
+  #define CORE_INT_EVERY_PIN
+
 // Arduino Uno, Duemilanove, LilyPad, Mini, Fio, etc...
 #else
   #define CORE_INT0_PIN  2
