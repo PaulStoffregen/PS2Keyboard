@@ -5,7 +5,8 @@
 
   ** Mostly rewritten Paul Stoffregen <paul@pjrc.com>, June 2010
   ** Modified for use with Arduino 13 by L. Abraham Smith, <n3bah@microcompdesign.com> * 
-  ** Modified for easy interrup pin assignement on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified for easy interrupt pin assignment on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified to provide command send facility. Belliveau <flbgaming@gmail.com> using code by Peter Hanlon <pphanlon@bigpond.net.au> June 2016
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -187,6 +188,28 @@ extern const PROGMEM PS2Keymap_t PS2Keymap_Spanish;
 extern const PROGMEM PS2Keymap_t PS2Keymap_Italian;
 extern const PROGMEM PS2Keymap_t PS2Keymap_UK;
 
+/**
+ * @name Send Status Codes
+ *
+ * When sending a command byte to the keyboard it is possible that the
+ * keyboard will not respond to the "request to send" signalling.  There are
+ * a number of other possibilities, including that there is no keyboard
+ * connected.  Below is the list of potential results that may be returned
+ * by the "send" method.
+ *
+ * @{
+ */
+/// Timeout waiting for KBD data clock; possibly not PS2 or no KBD avail.
+#define SEND_TIMED_OUT 0
+/// KBD failed to set ACK bit correctly.
+#define SEND_NOT_ACKED 1
+/// Timeout waiting for response code from KBD.
+#define SEND_REPLY_TIMEOUT 2
+/// KBD did not understand the byte value; response is resend request.
+#define SEND_BYTE_REJECTED 0xFE
+/// KBD accepted byte value as valid.
+#define SEND_BYTE_OKAY 0xFA
+///@}
 
 /**
  * Purpose: Provides an easy access to PS2 keyboards
@@ -203,30 +226,76 @@ class PS2Keyboard {
     /**
      * Starts the keyboard "service" by registering the external interrupt.
      * setting the pin modes correctly and driving those needed to high.
-     * The propably best place to call this method is in the setup routine.
+     * The probable best place to call this method is in the setup routine.
      */
     static void begin(uint8_t dataPin, uint8_t irq_pin, const PS2Keymap_t &map = PS2Keymap_US);
 
     /**
      * Returns true if there is a char to be read, false if not.
+     *
+     * Warning: this will consume buffered scan codes until either a char
+     * is decoded, or there are none remaining.
      */
     static bool available();
 
-    /* Discards any received data, sets available() to false without a call to read()
-    */
+    /**
+     * Discards any received data, sets available() to false without a call to read()
+     */
     static void clear();
 
+protected:
     /**
-     * Retutns ps2 scan code.
+     * Returns the next ps2 scan code that was received; removing it from
+     * the buffer.
+     *
+     * Calling this method removes the scan code from the buffer such that
+     * it is not available to be translated by the read() or readUincode()
+     * methods.
+     *
+     * @return The next scan code received. Zero when no scan code is
+     *      available.
      */
     static uint8_t readScanCode(void);
 
+public:
     /**
-     * Returns the char last read from the keyboard.
-     * If there is no char available, -1 is returned.
+     * Gets the next char read from the keyboard.
+     *
+     * @return The next char read from the keyboard or
+     *      -1 if there is no char available.
      */
     static int read();
     static int readUnicode();
+
+    /**
+     * Sends a byte to the keyboard.
+     *
+     * @param byteCmd Byte value for command to send.
+     *
+     * @return Unsigned 8-bit "send status" value from those named with
+     * SEND_ prefix.
+     */
+    static uint8_t send(uint8_t byteCmd);
+
+    /**
+     * Container for the current state of the keyboard interface.
+     */
+    struct KeyboardState
+    {
+        /// Indicates that a byte is being received from the keyboard.
+        uint8_t receiving;
+        /// Indicates that a byte is being sent to the keyboard.
+        uint8_t sending;
+        /// Outgoing byte either in progress or last sent.
+        uint8_t outgoing;
+    };
+
+    /**
+     * Gets the current state of the keyboard interface logic.
+     *
+     * @return Current KeyboardState.
+     */
+    static KeyboardState getState();
 };
 
 #endif

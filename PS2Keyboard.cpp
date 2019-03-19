@@ -4,12 +4,16 @@
   Written by Christian Weichel <info@32leaves.net>
 
   ** Mostly rewritten Paul Stoffregen <paul@pjrc.com> 2010, 2011
-  ** Modified for use beginning with Arduino 13 by L. Abraham Smith, <n3bah@microcompdesign.com> * 
-  ** Modified for easy interrup pin assignement on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified for use beginning with Arduino 13 by L. Abraham Smith, <n3bah@microcompdesign.com> *
+  ** Modified for easy interrupt pin assignment on method begin(datapin,irq_pin). Cuningan <cuninganreset@gmail.com> **
+  ** Modified to provide command send facility. Belliveau <flbgaming@gmail.com> using code by Peter Hanlon <pphanlon@bigpond.net.au> June 2016
 
   for more information you can read the original wiki in arduino.cc
   at http://www.arduino.cc/playground/Main/PS2Keyboard
   or http://www.pjrc.com/teensy/td_libs_PS2Keyboard.html
+
+  Version 2.5 (January 2018)
+  - Support for sending commands to keyboard and checking state
 
   Version 2.4 (March 2013)
   - Support Teensy 3.0, Arduino Due, Arduino Leonardo & other boards
@@ -53,42 +57,22 @@
 #define BUFFER_SIZE 45
 static volatile uint8_t buffer[BUFFER_SIZE];
 static volatile uint8_t head, tail;
+
+static volatile uint8_t Sending=0;
+static volatile uint8_t Receiving=0;
+static volatile uint8_t Ack=0;
+static volatile uint8_t Parity=0;
+static volatile uint8_t Outgoing=0;
+
 static uint8_t DataPin;
+static uint8_t IrqPin;
 static uint8_t CharBuffer=0;
 static uint8_t UTF8next=0;
 static const PS2Keymap_t *keymap=NULL;
 
-// The ISR for the external interrupt
-void ps2interrupt(void)
+static inline bool is_scan_code_avail(void)
 {
-	static uint8_t bitcount=0;
-	static uint8_t incoming=0;
-	static uint32_t prev_ms=0;
-	uint32_t now_ms;
-	uint8_t n, val;
-
-	val = digitalRead(DataPin);
-	now_ms = millis();
-	if (now_ms - prev_ms > 250) {
-		bitcount = 0;
-		incoming = 0;
-	}
-	prev_ms = now_ms;
-	n = bitcount - 1;
-	if (n <= 7) {
-		incoming |= (val << n);
-	}
-	bitcount++;
-	if (bitcount == 11) {
-		uint8_t i = head + 1;
-		if (i >= BUFFER_SIZE) i = 0;
-		if (i != tail) {
-			buffer[i] = incoming;
-			head = i;
-		}
-		bitcount = 0;
-		incoming = 0;
-	}
+    return (tail != head);
 }
 
 static inline uint8_t get_scan_code(void)
@@ -100,8 +84,167 @@ static inline uint8_t get_scan_code(void)
 	i++;
 	if (i >= BUFFER_SIZE) i = 0;
 	c = buffer[i];
-	tail = i;
+
+    tail = i;
+    /* Add leading slash for debug output
+    Serial.print(c, HEX);
+    Serial.print(" ");
+    //*/
 	return c;
+}
+
+/* Numbered steps are from http://www.computer-engineering.org/ps2protocol
+ * Author: Adam Chapweske
+ * Last Updated: 05/09/03
+ *
+ * Steps required overall to send data to a PS/2 device:
+ *
+ * 1)  Bring the Clock line low for at least 100 microseconds.
+ * 2)  Bring the Data line low. 
+ * 3)  Release the Clock line. 
+ * 4)  Wait for the device to bring the Clock line low. 
+ *
+ * Thus transfering control to the interupt handler. 
+ *
+ * 5)  Set/reset the Data line to send the first data bit 
+ * 6)  Wait for the device to bring Clock high. 
+ * 7)  Wait for the device to bring Clock low. 
+ * 8)  Repeat steps 5-7 for the other seven data bits and the parity bit 
+ *
+ * 9)  Release the Data line. 
+ * 10) Wait for the device to bring Data low. 
+ * 11) Wait for the device to bring Clock low. 
+ * 12) Wait for the device to release Data and Clock
+ *
+ * After that the keyboard responds with either FA for "okay",
+ * or FE for "try again".
+ */
+uint8_t PS2Keyboard::send(uint8_t byteCmd)
+{
+    while (Receiving > 0)      // wait until idle
+    {
+        // 1100 uSec Max byte Rx time
+        delayMicroseconds(100);
+    }
+    pinMode(IrqPin,OUTPUT);
+    digitalWrite(IrqPin,LOW);
+    Sending = 1;
+    Outgoing = byteCmd;
+    Ack = 1;          // should drop to 0
+    delayMicroseconds(150); // 100 minimum required
+    pinMode(DataPin,OUTPUT);
+    digitalWrite(DataPin,LOW);
+
+    // now that send has control, clear the buffer so response is available
+    clear();
+
+#ifdef INPUT_PULLUP
+    pinMode(IrqPin, INPUT_PULLUP);
+#else
+    pinMode(IrqPin,INPUT);
+    digitalWrite(IrqPin,HIGH);
+#endif
+    unsigned long startTime = micros();
+    
+    while ((Sending > 0) && (2000 > (micros() - startTime)))
+    {
+        delayMicroseconds(50);
+    }
+    uint8_t result = (Sending > 0) ? SEND_TIMED_OUT : SEND_NOT_ACKED;
+
+    if (!Ack) // Send was Ack'ed
+    {
+        startTime = micros();
+        while ((2000 > (micros() - startTime)) && !is_scan_code_avail())
+        {
+            delayMicroseconds(50);
+        }
+        if (is_scan_code_avail())
+        {
+            result = get_scan_code(); // expect Resend or Okay
+        }
+        else
+        {
+            result = SEND_REPLY_TIMEOUT;
+        }
+    }
+    return(result);
+}
+
+// The ISR for the external interrupt
+void ps2interrupt(void)
+{
+    static uint8_t bitcount=0;
+    static uint8_t incoming=0;
+    static uint32_t prev_ms=0;
+    uint32_t now_ms;
+    uint8_t n, val;
+
+    now_ms = millis();
+
+    if (Sending == 0) {     // receiving mode
+        val = digitalRead(DataPin);
+        if (now_ms - prev_ms > 250) {
+            bitcount = 0;
+            incoming = 0;
+            Receiving = 1;  // receive cycle in progress
+        }
+        prev_ms = now_ms;
+        n = bitcount - 1;
+        if (n <= 7) {
+            incoming |= (val << n);
+        }
+        bitcount++;
+        if (bitcount == 11) {
+            uint8_t i = head + 1;
+            if (i >= BUFFER_SIZE) i = 0;
+            if (i != tail) {
+                buffer[i] = incoming;
+                head = i;
+            }
+            bitcount = 0;
+            incoming = 0;
+            Receiving = 0;  // receive cycle complete
+        }
+    }
+    else {  // sending mode
+        if (now_ms - prev_ms > 250) {
+            Sending = 1;    // signal "need init"
+        }
+        prev_ms = now_ms;
+        if (Sending == 1) {     // Sending mode - initialisation
+            bitcount = 0;
+            Parity = 1;
+            Sending = 2;        // Sending mode - body
+            pinMode(DataPin,OUTPUT);
+        }
+        if (bitcount < 8) {
+            n = bitcount;
+            val = (Outgoing >> n) & 1;
+            Parity ^= val;
+            digitalWrite(DataPin,val);
+        }
+        if (bitcount == 8) {
+            digitalWrite(DataPin,Parity);
+        }
+        if (bitcount == 9) {
+            digitalWrite(DataPin,HIGH); // Stop Bit
+#ifdef INPUT_PULLUP
+            pinMode(DataPin, INPUT_PULLUP);
+#else
+            pinMode(DataPin,INPUT);
+#endif
+        }
+        if (bitcount == 10) {
+            Ack = digitalRead(DataPin);
+        }
+        bitcount++;
+        if (bitcount == 11) {
+            Sending = 0;
+            bitcount = 0;
+            //pinMode(DataPin,INPUT);
+        }
+    }
 }
 
 // http://www.quadibloc.com/comp/scan.htm
@@ -556,10 +699,12 @@ PS2Keyboard::PS2Keyboard() {
   // nothing to do here, begin() does it all
 }
 
-void PS2Keyboard::begin(uint8_t data_pin, uint8_t irq_pin, const PS2Keymap_t &map) {
+void PS2Keyboard::begin(
+    uint8_t data_pin, uint8_t irq_pin, const PS2Keymap_t &map) {
   uint8_t irq_num=255;
 
   DataPin = data_pin;
+  IrqPin = irq_pin;
   keymap = &map;
 
   // initialize the pins
@@ -703,9 +848,20 @@ void PS2Keyboard::begin(uint8_t data_pin, uint8_t irq_pin, const PS2Keymap_t &ma
 
   head = 0;
   tail = 0;
+  Receiving = 0;
+  Sending = 0;
   if (irq_num < 255) {
     attachInterrupt(irq_num, ps2interrupt, FALLING);
   }
 }
 
+PS2Keyboard::KeyboardState PS2Keyboard::getState()
+{
+    KeyboardState result;
 
+    result.receiving = Receiving;
+    result.sending = Sending;
+    result.outgoing = Outgoing;
+
+    return result;
+}
