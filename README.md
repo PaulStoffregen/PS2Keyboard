@@ -18,6 +18,8 @@ keyboard.begin(DataPin, IRQpin)
 ```
 Begin receiving keystrokes. `DataPin` and `IRQpin` are the pin numbers to which you connected the PS/2 keyboard's Data and Clock signals.
 
+On most Arduinos, the `IRQpin` must be a pin capable of being used with an interrupt (for example, the Arduino Uno only supports using pins 2 and 3 - INT0 and INT1 - for this purpose). If you use a non-interrupt pin for this, nothing will seem to happen.
+
 ```c++
 keyboard.available()
 ```
