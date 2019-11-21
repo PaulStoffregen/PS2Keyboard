@@ -270,6 +270,64 @@ const PROGMEM PS2Keymap_t PS2Keymap_French = {
 	0, 0, 0, PS2_F7 }
 };
 
+const PROGMEM PS2Keymap_t PS2Keymap_BE = {
+  // without shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, PS2_SUPERSCRIPT_TWO, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'a', '&', 0,
+	0, 0, 'w', 's', 'q', 'z', PS2_e_ACUTE, 0,
+	0, 'c', 'x', 'd', 'e', '\'', '"', 0,
+	0, ' ', 'v', 'f', 't', 'r', '(', 0,
+	0, 'n', 'b', 'h', 'g', 'y', '§', 0,
+	0, 0, ',', 'j', 'u', PS2_e_GRAVE, '!', 0,
+	0, ';', 'k', 'i', 'o', PS2_a_GRAVE, PS2_c_CEDILLA, 0,
+	0, ':', '=', 'l', 'm', 'p', ')', 0,
+	0, 0, PS2_u_GRAVE, 0, '^', '-', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, '$', 0, '\\', 0, 0,
+	0, '<', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+  // with shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '~', 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'A', '1', 0,
+	0, 0, 'W', 'S', 'Q', 'Z', '2', 0,
+	0, 'C', 'X', 'D', 'E', '4', '3', 0,
+	0, ' ', 'V', 'F', 'T', 'R', '5', 0,
+	0, 'N', 'B', 'H', 'G', 'Y', '6', 0,
+	0, 0, '?', 'J', 'U', '7', '8', 0,
+	0, '.', 'K', 'I', 'O', '0', '9', 0,
+	0, '/', '+', 'L', 'M', 'P', PS2_DEGREE_SIGN, 0,
+	0, 0, '%', 0, PS2_DIAERESIS, '_', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, PS2_POUND_SIGN, 0, PS2_MICRO_SIGN, 0, 0,
+	0, '>', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+	1,
+  // with altgr
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, '@', 0, 0,
+	0, 0, 0, 0, 0, 0, '~', 0,
+	0, 0, 0, 0, 0 /*PS2_EURO_SIGN*/, '{', '#', 0,
+	0, 0, 0, 0, 0, 0, '[', 0,
+	0, 0, 0, 0, 0, 0, '|', 0,
+	0, 0, 0, 0, 0, '`', '\\', 0,
+	0, 0, 0, 0, 0, '@', '^', 0,
+	0, 0, 0, 0, 0, 0, ']', 0,
+	0, 0, 0, 0, 0, 0, '}', 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, PS2_CURRENCY_SIGN, 0, '#', 0, 0,
+	0, '|', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 }
+};
+
 const PROGMEM PS2Keymap_t PS2Keymap_Spanish = {
 		// without shift
 		{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
