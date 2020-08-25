@@ -11,6 +11,9 @@
   at http://www.arduino.cc/playground/Main/PS2Keyboard
   or http://www.pjrc.com/teensy/td_libs_PS2Keyboard.html
 
+  Version 2.4.1 (March 2020)
+  - Support ESP8266 boards
+
   Version 2.4 (March 2013)
   - Support Teensy 3.0, Arduino Due, Arduino Leonardo & other boards
   - French keyboard layout, David Chochoi, tchoyyfr at yahoo dot fr
@@ -59,7 +62,11 @@ static uint8_t UTF8next=0;
 static const PS2Keymap_t *keymap=NULL;
 
 // The ISR for the external interrupt
-void ps2interrupt(void)
+#ifdef ESP8266 AND ESP8266 > 242
+	ICACHE_RAM_ATTR void ps2interrupt(void)
+#else
+	void ps2interrupt(void)
+#endif
 {
 	static uint8_t bitcount=0;
 	static uint8_t incoming=0;
