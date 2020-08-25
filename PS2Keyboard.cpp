@@ -62,10 +62,14 @@ static uint8_t UTF8next=0;
 static const PS2Keymap_t *keymap=NULL;
 
 // The ISR for the external interrupt
-#ifdef ESP8266 AND ESP8266 > 242
-	ICACHE_RAM_ATTR void ps2interrupt(void)
+#ifdef ESP8266 
+  #if ESP8266 > 242
+    ICACHE_RAM_ATTR void ps2interrupt(void)
+  #else
+    void ps2interrupt(void)
+  #endif
 #else
-	void ps2interrupt(void)
+  void ps2interrupt(void)
 #endif
 {
 	static uint8_t bitcount=0;
