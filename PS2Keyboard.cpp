@@ -11,6 +11,9 @@
   at http://www.arduino.cc/playground/Main/PS2Keyboard
   or http://www.pjrc.com/teensy/td_libs_PS2Keyboard.html
 
+  Version 2.4.1 (March 2020)
+  - Support ESP8266 boards
+
   Version 2.4 (March 2013)
   - Support Teensy 3.0, Arduino Due, Arduino Leonardo & other boards
   - French keyboard layout, David Chochoi, tchoyyfr at yahoo dot fr
@@ -59,7 +62,12 @@ static uint8_t UTF8next=0;
 static const PS2Keymap_t *keymap=NULL;
 
 // The ISR for the external interrupt
-void ps2interrupt(void)
+
+#ifdef ESP8266 
+	ICACHE_RAM_ATTR void ps2interrupt(void)
+#else
+	void ps2interrupt(void)
+#endif
 {
 	static uint8_t bitcount=0;
 	static uint8_t incoming=0;
@@ -270,6 +278,64 @@ const PROGMEM PS2Keymap_t PS2Keymap_French = {
 	0, 0, 0, PS2_F7 }
 };
 
+const PROGMEM PS2Keymap_t PS2Keymap_BE = {
+  // without shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, PS2_SUPERSCRIPT_TWO, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'a', '&', 0,
+	0, 0, 'w', 's', 'q', 'z', PS2_e_ACUTE, 0,
+	0, 'c', 'x', 'd', 'e', '\'', '"', 0,
+	0, ' ', 'v', 'f', 't', 'r', '(', 0,
+	0, 'n', 'b', 'h', 'g', 'y', PS2_SECTION_SIGN, 0,
+	0, 0, ',', 'j', 'u', PS2_e_GRAVE, '!', 0,
+	0, ';', 'k', 'i', 'o', PS2_a_GRAVE, PS2_c_CEDILLA, 0,
+	0, ':', '=', 'l', 'm', 'p', ')', 0,
+	0, 0, PS2_u_GRAVE, 0, '^', '-', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, '$', 0, '\\', 0, 0,
+	0, '<', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+  // with shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, '~', 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'A', '1', 0,
+	0, 0, 'W', 'S', 'Q', 'Z', '2', 0,
+	0, 'C', 'X', 'D', 'E', '4', '3', 0,
+	0, ' ', 'V', 'F', 'T', 'R', '5', 0,
+	0, 'N', 'B', 'H', 'G', 'Y', '6', 0,
+	0, 0, '?', 'J', 'U', '7', '8', 0,
+	0, '.', 'K', 'I', 'O', '0', '9', 0,
+	0, '/', '+', 'L', 'M', 'P', PS2_DEGREE_SIGN, 0,
+	0, 0, '%', 0, PS2_DIAERESIS, '_', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, PS2_POUND_SIGN, 0, PS2_MICRO_SIGN, 0, 0,
+	0, '>', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+	1,
+  // with altgr
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, '@', 0, 0,
+	0, 0, 0, 0, 0, 0, '~', 0,
+	0, 0, 0, 0, 0 /*PS2_EURO_SIGN*/, '{', '#', 0,
+	0, 0, 0, 0, 0, 0, '[', 0,
+	0, 0, 0, 0, 0, 0, '|', 0,
+	0, 0, 0, 0, 0, '`', '\\', 0,
+	0, 0, 0, 0, 0, '@', '^', 0,
+	0, 0, 0, 0, 0, 0, ']', 0,
+	0, 0, 0, 0, 0, 0, '}', 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, PS2_CURRENCY_SIGN, 0, '#', 0, 0,
+	0, '|', 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', 0, '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 }
+};
+
 const PROGMEM PS2Keymap_t PS2Keymap_Spanish = {
 		// without shift
 		{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
@@ -357,7 +423,7 @@ const PROGMEM PS2Keymap_t PS2Keymap_Italian = {
 		 0, 'N', 'B', 'H', 'G', 'Y', '&', 0,
 		 0, 0, 'M', 'J', 'U', '/', '(', 0,
 		 0, ';', 'K', 'I', 'O', '=', ')', 0,
-		 0, ':', '_', 'L', PS2_c_CEDILLA, 0, '?', 0,
+		 0, ':', '_', 'L', PS2_c_CEDILLA, 'P', '?', 0,
 		 0, 0, PS2_DEGREE_SIGN, 0, PS2_e_ACUTE, '^', 0, 0,
 		 0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, '*', 0, PS2_SECTION_SIGN, 0, 0,
 		 0, '>', 0, 0, 0, 0, PS2_BACKSPACE, 0,
@@ -369,16 +435,16 @@ const PROGMEM PS2Keymap_t PS2Keymap_Italian = {
 		// with altgr
 		{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
 		 0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, PS2_NOT_SIGN, 0,
-		 0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'q', PS2_SUPERSCRIPT_ONE, 0,
-		 0, 0, 'z', 's', 'a', 'w', PS2_SUPERSCRIPT_TWO, 0,
-		 0, 'c', 'x', 'd', PS2_EURO_SIGN, PS2_FRACTION_ONE_QUARTER, PS2_SUPERSCRIPT_THREE, 0,
-		 0, ' ', 'v', 'f', 't', 'r', PS2_FRACTION_ONE_HALF, 0,
-		 0, 'n', 'b', 'h', 'g', 'y', PS2_NOT_SIGN, 0,
-		 0, 0, 'm', 'j', 'u', '{', '[', 0,
-		 0, ',', 'k', 'i', 'o', '}', ']', 0,
-		 0, '.', '-', 'l', '@', 'p', '\'', 0,
+		 0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, '@', PS2_SUPERSCRIPT_ONE, 0,
+		 0, 0, PS2_LEFT_DOUBLE_ANGLE_QUOTE, PS2_SHARP_S, PS2_ae, 0/*l with stroke*/, PS2_SUPERSCRIPT_TWO, 0,
+		 0, PS2_CENT_SIGN, PS2_RIGHT_DOUBLE_ANGLE_QUOTE, PS2_eth, PS2_EURO_SIGN, PS2_FRACTION_ONE_QUARTER, PS2_SUPERSCRIPT_THREE, 0,
+		 0, ' ', 0/*quotation mark*/, 0/*crossed d*/, 0/*crossed t*/, PS2_PILCROW_SIGN, PS2_FRACTION_ONE_HALF, 0,
+		 0, PS2_n_TILDE, 0/*quotation mark*/, 0/*h with bar*/, 0/*engma*/, 0/*arrow left*/, PS2_NOT_SIGN, 0,
+		 0, 0, PS2_MICRO_SIGN, 0/*?*/, 0/*arrow down*/, '{', '}', 0,
+		 0, 0/*two times is acute accent*/, 0/*kra*/, 0/*right arrow*/, PS2_o_STROKE, '}', ']', 0,
+		 0, PS2_MIDDLE_DOT, 0/*two times is macron*/, 0/*l with stroke*/, '@', PS2_thorn, '`', 0,
 		 0, 0, '#', 0, '[', '~', 0, 0,
-		 0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, ']', 0, 0, 0, 0,
+		 0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, ']', 0, 0/*two times is backtick*/, 0, 0,
 		 0, PS2_LEFT_DOUBLE_ANGLE_QUOTE, 0, 0, 0, 0, PS2_BACKSPACE, 0,
 		 0, '1', 0, '4', '7', 0, 0, 0,
 		 '0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
@@ -408,10 +474,10 @@ const PROGMEM PS2Keymap_t PS2Keymap_UK = {
 	0, 0, 0, PS2_F7 },
   // with shift
 	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
-	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 172 /* ¬ */, 0,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, PS2_NOT_SIGN /* ¬ */, 0,
 	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'Q', '!', 0,
 	0, 0, 'Z', 'S', 'A', 'W', '"', 0,
-	0, 'C', 'X', 'D', 'E', '$', 163 /* £ */, 0,
+	0, 'C', 'X', 'D', 'E', '$', PS2_POUND_SIGN /* £ */, 0,
 	0, ' ', 'V', 'F', 'T', 'R', '%', 0,
 	0, 'N', 'B', 'H', 'G', 'Y', '^', 0,
 	0, 0, 'M', 'J', 'U', '&', '*', 0,
@@ -426,6 +492,47 @@ const PROGMEM PS2Keymap_t PS2Keymap_UK = {
 	0, 0, 0, PS2_F7 },
 	0
 };
+
+const PROGMEM PS2Keymap_t PS2Keymap_JP = {
+	// without shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0 /* HAN/ZEN */, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'q', '1', 0,
+	0, 0, 'z', 's', 'a', 'w', '2', 0,
+	0, 'c', 'x', 'd', 'e', '4', '3', 0,
+	0, ' ', 'v', 'f', 't', 'r', '5', 0,
+	0, 'n', 'b', 'h', 'g', 'y', '6', 0,
+	0, 0, 'm', 'j', 'u', '7', '8', 0,
+	0, ',', 'k', 'i', 'o', '0', '9', 0,
+	0, '.', '/', 'l', ';', 'p', '-', 0,
+	0, '\\', ':', 0, '@', '^', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, '[', 0, ']', '^', 0,
+	0, 0, 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', '\\', '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+	// with shift
+	{0, PS2_F9, 0, PS2_F5, PS2_F3, PS2_F1, PS2_F2, PS2_F12,
+	0, PS2_F10, PS2_F8, PS2_F6, PS2_F4, PS2_TAB, 0 /* HAN/ZEN */, 0,
+	0, 0 /*Lalt*/, 0 /*Lshift*/, 0, 0 /*Lctrl*/, 'Q', '!', 0,
+	0, 0, 'Z', 'S', 'A', 'W', '\"', 0,
+	0, 'C', 'X', 'D', 'E', '$', '#', 0,
+	0, ' ', 'V', 'F', 'T', 'R', '%', 0,
+	0, 'N', 'B', 'H', 'G', 'Y', '&', 0,
+	0, 0, 'M', 'J', 'U', '\'', '(', 0,
+	0, '<', 'K', 'I', 'O', '~', ')', 0,
+	0, '>', '?', 'L', '+', 'P', '=', 0,
+	0, '_', '*', 0, '`', '~', 0, 0,
+	0 /*CapsLock*/, 0 /*Rshift*/, PS2_ENTER /*Enter*/, '{', 0, '}', '~', 0,
+	0, 0, 0, 0, 0, 0, PS2_BACKSPACE, 0,
+	0, '1', '|', '4', '7', 0, 0, 0,
+	'0', '.', '2', '5', '6', '8', PS2_ESC, 0 /*NumLock*/,
+	PS2_F11, '+', '3', '-', '*', '9', PS2_SCROLL, 0,
+	0, 0, 0, PS2_F7 },
+	0
+};
+
 
 #define BREAK     0x01
 #define MODIFIER  0x02
@@ -573,138 +680,17 @@ void PS2Keyboard::begin(uint8_t data_pin, uint8_t irq_pin, const PS2Keymap_t &ma
   digitalWrite(data_pin, HIGH);
 #endif
 
-#ifdef CORE_INT_EVERY_PIN
+//#ifdef CORE_INT_EVERY_PIN
   irq_num = irq_pin;
-
+/*
 #else
-  switch(irq_pin) {
-    #ifdef CORE_INT0_PIN
-    case CORE_INT0_PIN:
-      irq_num = 0;
-      break;
-    #endif
-    #ifdef CORE_INT1_PIN
-    case CORE_INT1_PIN:
-      irq_num = 1;
-      break;
-    #endif
-    #ifdef CORE_INT2_PIN
-    case CORE_INT2_PIN:
-      irq_num = 2;
-      break;
-    #endif
-    #ifdef CORE_INT3_PIN
-    case CORE_INT3_PIN:
-      irq_num = 3;
-      break;
-    #endif
-    #ifdef CORE_INT4_PIN
-    case CORE_INT4_PIN:
-      irq_num = 4;
-      break;
-    #endif
-    #ifdef CORE_INT5_PIN
-    case CORE_INT5_PIN:
-      irq_num = 5;
-      break;
-    #endif
-    #ifdef CORE_INT6_PIN
-    case CORE_INT6_PIN:
-      irq_num = 6;
-      break;
-    #endif
-    #ifdef CORE_INT7_PIN
-    case CORE_INT7_PIN:
-      irq_num = 7;
-      break;
-    #endif
-    #ifdef CORE_INT8_PIN
-    case CORE_INT8_PIN:
-      irq_num = 8;
-      break;
-    #endif
-    #ifdef CORE_INT9_PIN
-    case CORE_INT9_PIN:
-      irq_num = 9;
-      break;
-    #endif
-    #ifdef CORE_INT10_PIN
-    case CORE_INT10_PIN:
-      irq_num = 10;
-      break;
-    #endif
-    #ifdef CORE_INT11_PIN
-    case CORE_INT11_PIN:
-      irq_num = 11;
-      break;
-    #endif
-    #ifdef CORE_INT12_PIN
-    case CORE_INT12_PIN:
-      irq_num = 12;
-      break;
-    #endif
-    #ifdef CORE_INT13_PIN
-    case CORE_INT13_PIN:
-      irq_num = 13;
-      break;
-    #endif
-    #ifdef CORE_INT14_PIN
-    case CORE_INT14_PIN:
-      irq_num = 14;
-      break;
-    #endif
-    #ifdef CORE_INT15_PIN
-    case CORE_INT15_PIN:
-      irq_num = 15;
-      break;
-    #endif
-    #ifdef CORE_INT16_PIN
-    case CORE_INT16_PIN:
-      irq_num = 16;
-      break;
-    #endif
-    #ifdef CORE_INT17_PIN
-    case CORE_INT17_PIN:
-      irq_num = 17;
-      break;
-    #endif
-    #ifdef CORE_INT18_PIN
-    case CORE_INT18_PIN:
-      irq_num = 18;
-      break;
-    #endif
-    #ifdef CORE_INT19_PIN
-    case CORE_INT19_PIN:
-      irq_num = 19;
-      break;
-    #endif
-    #ifdef CORE_INT20_PIN
-    case CORE_INT20_PIN:
-      irq_num = 20;
-      break;
-    #endif
-    #ifdef CORE_INT21_PIN
-    case CORE_INT21_PIN:
-      irq_num = 21;
-      break;
-    #endif
-    #ifdef CORE_INT22_PIN
-    case CORE_INT22_PIN:
-      irq_num = 22;
-      break;
-    #endif
-    #ifdef CORE_INT23_PIN
-    case CORE_INT23_PIN:
-      irq_num = 23;
-      break;
-    #endif
-  }
+  irq_num = digitalPinToInterrupt(irq_pin);
 #endif
-
+*/
   head = 0;
   tail = 0;
   if (irq_num < 255) {
-    attachInterrupt(irq_num, ps2interrupt, FALLING);
+    attachInterrupt(digitalPinToInterrupt(irq_num), ps2interrupt, FALLING);
   }
 }
 

@@ -39,7 +39,7 @@
 // for each "special" key.  To ignore a key, use zero.
 #define PS2_TAB				9
 #define PS2_ENTER			13
-#define PS2_BACKSPACE			127
+#define PS2_BACKSPACE			8
 #define PS2_ESC				27
 #define PS2_INSERT			0
 #define PS2_DELETE			127
@@ -183,9 +183,11 @@ typedef struct {
 extern const PROGMEM PS2Keymap_t PS2Keymap_US;
 extern const PROGMEM PS2Keymap_t PS2Keymap_German;
 extern const PROGMEM PS2Keymap_t PS2Keymap_French;
+extern const PROGMEM PS2Keymap_t PS2Keymap_BE;
 extern const PROGMEM PS2Keymap_t PS2Keymap_Spanish;
 extern const PROGMEM PS2Keymap_t PS2Keymap_Italian;
 extern const PROGMEM PS2Keymap_t PS2Keymap_UK;
+extern const PROGMEM PS2Keymap_t PS2Keymap_JP;
 
 
 /**
