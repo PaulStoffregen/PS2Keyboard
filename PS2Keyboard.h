@@ -186,6 +186,7 @@ extern const PROGMEM PS2Keymap_t PS2Keymap_French;
 extern const PROGMEM PS2Keymap_t PS2Keymap_Spanish;
 extern const PROGMEM PS2Keymap_t PS2Keymap_Italian;
 extern const PROGMEM PS2Keymap_t PS2Keymap_UK;
+extern const PROGMEM PS2Keymap_t PS2Keymap_JP;
 
 
 /**
